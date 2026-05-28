@@ -1,0 +1,90 @@
+PART 1
+
+HEADS AA
+
+START ## ROCK ** RR
+ROCK ## ROCK ** RR
+ROCK __ STOP ** SS
+
+ROCK == SOIL_INITIAL ~~ RD
+SOIL_INITIAL =* SOIL ~_ RR
+SOIL_INITIAL #* SOIL ** SU
+SOIL #_ SOIL ** SU
+SOIL #~ ROCK ** SR
+
+SOIL =_ SOIL ~~ RR
+
+PART 2
+
+HEADS AAA
+
+START *** SETUP1 *** SDD
+SETUP1 *** SETUP2 *** RSD
+SETUP2 *** MAIN *** SSL
+MAIN #** MAIN #** RRR
+MAIN =** ONE ~** RRR
+ONE =** TWO ~** RRR
+TWO =** THREE ~~* RRR
+THREE =** FOUR ~~* RRR
+FOUR =** FOUR ~~~ RRR
+ONE #** MAIN *** RRR
+TWO #** MAIN *** RRR
+THREE #** MAIN *** RRR
+FOUR #** MAIN *** RRR
+MAIN _** STOP *** SSS
+
+PART 3
+
+HEADS A
+
+//first line (we add a buffer to prevent weirdness with anchors intersecting pond)
+START * INITIAL * R
+INITIAL # INITIAL * R
+INITIAL = WRITE_DOWN ~ D
+WRITE_DOWN _ RIGHT ~ U
+RIGHT * INITIAL * R
+INITIAL _ BUFFER # R
+BUFFER _ DOWN * D
+DOWN * LEFT * L
+LEFT * BACK $ U
+BACK ! BACK * L
+BACK _ SETUP * R
+SETUP * DOWN_ONE * D
+DOWN_ONE * DROP_ANCHOR_L * D
+
+//start next lines assuming no writes
+LAYER_EMPTY _ LAYER_EMPTY _ R
+
+//once we hit a write, repeat initial line, after trimming two ends by 1 each
+LAYER_EMPTY ~ POND _ R
+POND _ CLEANUP _ L
+POND ~ WRITE_DOWN_POND ~ D
+WRITE_DOWN_POND * WRITE_DOWN_POND_BACK ~ U
+WRITE_DOWN_POND_BACK * POND * R
+CLEANUP * CLEANUP_DOWN _ D
+CLEANUP_DOWN * LAYER _ U
+
+//resume scanning line, but now we know we did at least one write (so need to check further lines)
+LAYER _ LAYER _ R
+LAYER ~ POND _ R
+
+//reset head back to beginning of next line via anchors
+POND $ CHECKBACK _ L
+CHECKBACK * STOP _ S
+LAYER $ NEXT_LAYER _ D
+NEXT_LAYER _ LEFT_ONE $ L
+LEFT_ONE * RESET_HEAD * L
+RESET_HEAD $ DROP_ANCHOR_L _ D
+RESET_HEAD _ RESET_HEAD * L
+RESET_HEAD ~ RESET_HEAD * L
+DROP_ANCHOR_L * LAYER_EMPTY $ U
+
+//once we hit row with no writes, we're down so we cleanup remaining written symbols
+LAYER_EMPTY $ CLEANUP_ANCHOR _ D
+CLEANUP_ANCHOR _ CLEANUP_ANCHOR _ L
+CLEANUP_ANCHOR $ CLEANUP_BUFFER _ U
+CLEANUP_BUFFER _ CLEANUP_BUFFER _ U
+CLEANUP_BUFFER ! FIND_BUFFER * R
+FIND_BUFFER ! FIND_BUFFER * R
+FIND_BUFFER _ KILL_BUFFER * L
+KILL_BUFFER # STOP _ S
